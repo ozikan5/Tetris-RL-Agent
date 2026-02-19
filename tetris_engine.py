@@ -120,17 +120,18 @@ class TetrisEngine:
                 if not valid:
                     continue
 
-                # clear lines and calculate reward 
+                # clear lines and calculate reward
                 cleared_board, lines = self.clear_lines(next_board)
 
-                # initial reward scheme (huge reward for clearing multiple lines at once)
-                reward = 1 + (lines ** 2) * 10
+                # reward: small survival bonus + strong bonus for clearing lines
+                reward = 1.0 + (lines ** 2) * 10
 
                 # check if the game is over (if there is a piece in the top row after placing)
                 is_game_over = np.any(cleared_board[0, :] == 1)
                 if is_game_over:
-                    # a very big negative reward for losing the game
-                    reward -= 100
+                    # negative reward for losing, but not so large that one loss dominates learning
+                    # was previously -100 and the agent wasn't learning much
+                    reward -= 25
 
                 states[(rot_idx, x)] = (cleared_board, reward, is_game_over)
 
