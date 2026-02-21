@@ -38,9 +38,17 @@ Tetris_RL_Project/
 - NumPy
 - PyTorch (for DQN agent only)
 
+**Option 1: Install as package (recommended for development)**
+```bash
+pip install -e .
+```
+This installs the package in editable mode, so imports work everywhere and VSCode can resolve them.
+
+**Option 2: Just install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
+Then run scripts from project root (they handle imports automatically).
 
 ## Quick Start
 
