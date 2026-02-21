@@ -27,8 +27,10 @@ Tetris_RL_Project/
 │           ├── __init__.py
 │           └── dqn.py          # DQNModel: PyTorch neural network
 ├── scripts/
-│   └── train_tabular.py       # Training script for tabular agent
+│   ├── train_tabular.py       # Training script for tabular agent
+│   └── train_dqn.py           # Training script for DQN agent
 ├── requirements.txt
+├── setup.py
 └── README.md
 ```
 
