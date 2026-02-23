@@ -8,6 +8,8 @@ from tetris_rl.environment import TetrisEngine
 from tetris_rl.agents import DQNAgent
 from tetris_rl.features import get_features
 
+MAX_PIECES_IN_GAME = 5000
+
 # main script to train the DQN agent and output the results
 def train_dqn(batch_size=64, queue_len=100000, hidden_layer_size=64, episodes=10000):
     # initialize our environment and agent
@@ -22,6 +24,7 @@ def train_dqn(batch_size=64, queue_len=100000, hidden_layer_size=64, episodes=10
     for episode in range(episodes):
         board = env.reset()
         game_over = False
+        pieces = 0
 
         while not game_over:
             # get the state before taking action
@@ -45,6 +48,11 @@ def train_dqn(batch_size=64, queue_len=100000, hidden_layer_size=64, episodes=10
 
             # learn from replay buffer (samples batch, computes TD targets, updates model)
             agent.learn()
+
+            pieces += 1
+            # to avoid infinitely going game problem, set a limit to max pieces
+            if pieces > MAX_PIECES_IN_GAME:
+                game_over = True
 
         # track scores for logging
         score_window.append(env.score)
