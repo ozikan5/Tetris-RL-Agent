@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <cstring>
 #include <random>
+#include <algorithm>
 
 constexpr int BOARD_HEIGHT = 20;
 constexpr int BOARD_WIDTH = 10;
@@ -20,12 +21,12 @@ struct Point {
 
 enum PieceType {
     I,
-    O,
-    T,
-    S,
-    Z,
     J,
-    L
+    L,
+    O,
+    S,
+    T,
+    Z
 };
 
 constexpr int PIECE_ROTATIONS[7] = {
@@ -42,6 +43,11 @@ struct NextState {
     int rotation;
     int x;
     std::vector<int> board;
+    float reward;
+    bool game_over;
+};
+
+struct StepResult {
     float reward;
     bool game_over;
 };
@@ -160,9 +166,9 @@ public:
                     return false; 
                 }
             }
-
-            return true;
         }
+
+        return true;
     }
 
     std::vector<NextState> get_next_states() {
@@ -273,9 +279,54 @@ public:
         return states;
     }
 
+    StepResult step(int rot, int x_pos) {
+        std::vector<NextState> next_states = this->get_next_states();
 
+        bool found = false;
+        float reward = 0.0f;
 
+        for (const auto& state : next_states) {
+            if (state.rotation == rot && state.x == x_pos) {
+                found = true;
+                
+                // copy the vector into the board
+                std::copy(state.board.begin(), state.board.end(), this->board);
 
+                this->game_over = state.game_over;
+
+                reward = state.reward;
+
+                this->score += reward;
+
+                
+                if (!this->game_over) {
+                    this->current_piece = this->get_new_piece();
+                }
+
+                break;
+
+            }
+        }
+
+        StepResult res;
+
+        if (!found) {
+            res.reward = -10;
+            res.game_over = true;
+            this->game_over = true;
+        }
+        else {
+            res.reward = reward;
+            res.game_over = this->game_over;
+        }
+
+        return res;
+    }
+
+    // helper function to get the board for pybind
+    std::vector<int> get_board() {
+        return std::vector<int>(this->board, this->board + (BOARD_HEIGHT * BOARD_WIDTH));
+    }
 };
 
 
