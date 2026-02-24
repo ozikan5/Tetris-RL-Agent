@@ -329,4 +329,40 @@ public:
     }
 };
 
+#include <pybind11/pybind11.h>
+// for converting vectors into python lists
+#include <pybind11/stl.h> 
+
+namespace py = pybind11;
+
+// we have the same class structure as our python script
+PYBIND11_MODULE(tetris_engine, m) {
+    
+    // create classes for stepresult and nextstate structs
+    py::class_<StepResult>(m, "StepResult")
+        .def_readonly("reward", &StepResult::reward)
+        .def_readonly("game_over", &StepResult::game_over);
+
+    py::class_<NextState>(m, "NextState")
+        .def_readonly("rotation", &NextState::rotation)
+        .def_readonly("x", &NextState::x)
+        .def_readonly("board", &NextState::board)
+        .def_readonly("reward", &NextState::reward)
+        .def_readonly("game_over", &NextState::game_over);
+
+    // bind the main tetrisengine class with its functions
+    py::class_<TetrisEngine>(m, "TetrisEngine")
+        .def(py::init<>()) // Expose the constructor
+        .def("reset", &TetrisEngine::reset)
+        .def("step", &TetrisEngine::step)
+        .def("get_next_states", &TetrisEngine::get_next_states)
+        .def("get_board", &TetrisEngine::get_board)
+        
+        .def_readwrite("score", &TetrisEngine::score)
+        .def_readwrite("game_over", &TetrisEngine::game_over)
+        .def_property_readonly("current_piece", [](const TetrisEngine& env) {
+            return static_cast<int>(env.current_piece); // Convert enum to int for Python
+        });
+}
+
 

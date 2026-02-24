@@ -2,7 +2,19 @@ venv/
 __pycache__/
 *.pyc
 .DS_Store
+*.dSYM/
 .vscode/
 *.egg-info/
 dist/
 build/
+
+# compiled cpp / pybind libs
+*.so
+*.dylib
+*.pyd
+*.o
+
+# pytorch checkpoints & logs
+*.pt
+*.pth
+runs/
