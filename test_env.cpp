@@ -38,6 +38,14 @@ constexpr int PIECE_ROTATIONS[7] = {
     2  // Z
 };
 
+struct NextState {
+    int rotation;
+    int x;
+    std::vector<int> board;
+    float reward;
+    bool game_over;
+};
+
 constexpr Point TETROMINOES[7][4][4] = {
     
     // 0: I Piece (Uses 2, Pads 2)
@@ -157,7 +165,37 @@ public:
         }
     }
 
-    
+    std::vector<NextState> get_next_states() {
+        // initialize the vector we'll return
+        std::vector<NextState> states;
+
+        // we can have at most 40 next states
+        // (10 cols * 4 rotations each)
+        states.reserve(40);
+
+        // get num of piece rotations
+        int piece_rotations = PIECE_ROTATIONS[this->current_piece];
+
+        // for each piece rotation
+        for (int rot = 0; rot < piece_rotations; rot++) {
+            // now we want the range of width to try
+            for (int x = -2; x < BOARD_WIDTH + 2; x++) {
+                int y = 0;
+                if (!this->is_valid_position(this->current_piece, rot, x, y)) {
+                    continue;
+                }
+
+                while (this->is_valid_position(this->current_piece, rot, x, y + 1)) {
+                    y++;
+                }
+
+                NextState future;
+                future.rotation = rot;
+                future.x = x;
+                future.game_over = false;
+            }
+        }
+    }
 
 
 };
