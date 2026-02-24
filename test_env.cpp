@@ -139,7 +139,7 @@ public:
         // we get the relevant points for the piece and rotation
         const auto& blocks = TETROMINOES[piece][rotation];
 
-        for (int i = 0; i < 4, i++) {
+        for (int i = 0; i < 4; i++) {
             int check_x = x + blocks[i].x;
             int check_y = y + blocks[i].y;
 
@@ -193,9 +193,87 @@ public:
                 future.rotation = rot;
                 future.x = x;
                 future.game_over = false;
+                future.board = std::vector<int>(this->board, this->board + (BOARD_HEIGHT * BOARD_WIDTH));
+
+                bool valid = true;
+
+                const auto& blocks = TETROMINOES[this->current_piece][rot];
+                for (int i = 0; i < 4; i++) {
+                    int final_x = x + blocks[i].x;
+                    int final_y = y + blocks[i].y;
+
+                    if (final_y >= 0 && final_y < BOARD_HEIGHT && final_x >= 0 && final_x < BOARD_WIDTH) {
+                        future.board[(final_y * BOARD_WIDTH) + final_x] = 1;
+                    } 
+                    else {
+                        valid = false;
+                    }
+
+
+                }
+
+                // if this move is not possible, not valid so continue
+                if (!valid) {
+                    continue; 
+                }
+
+                int cleared_lines = 0;
+
+                // iterate through every row to see lines cleared
+                for (int row = BOARD_HEIGHT - 1; row >= 0; row--) {
+                    bool all_clear = true;
+
+                    // look at all cols to see if the line is clear
+                    for (int col = 0; col < BOARD_WIDTH; col++) {
+                        if (future.board[(row * BOARD_WIDTH) + col] == 0) {
+                            all_clear = false;
+                            break;
+                        }
+                    }
+
+                    if (all_clear) {
+                        cleared_lines++;
+
+                        // we have to move every col one down
+                        for (int pull_row = row; pull_row > 0; pull_row--) {
+                            for (int col = 0; col < BOARD_WIDTH; col++) {
+                                // move data from upper row to the lower row
+                                future.board[(pull_row * BOARD_WIDTH) + col] = 
+                                    future.board[((pull_row - 1) * BOARD_WIDTH) + col];
+                            }
+                        }
+
+                        // zero out the very top row
+                        for (int col = 0; col < BOARD_WIDTH; col++) {
+                            future.board[col] = 0;
+                        }
+
+                        // since we moved all rows down, we have to check the same
+                        // row again because there is a different line there
+                        row++;
+                    }
+                }
+
+                for (int col = 0; col < BOARD_WIDTH; col++) {
+                    if (future.board[col] != 0) {
+                        future.game_over = true;
+                        break;
+                    }
+                }
+
+                future.reward = 1.0f + (cleared_lines * cleared_lines) * 10.0f;
+
+                if (future.game_over) future.reward -= 25.0f;
+
+                states.push_back(future);
+
             }
         }
+
+        return states;
     }
+
+
 
 
 };
