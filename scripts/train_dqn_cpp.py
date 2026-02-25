@@ -7,7 +7,7 @@ sys.path.insert(0, str(project_root / "src"))
 #from tetris_rl.environment import TetrisEngine
 from tetris_rl.agents import DQNAgent
 from tetris_rl.features import get_features
-import tetris_engine
+import tetris_rl.tetris_engine as tetris_engine
 import numpy as np
 
 MAX_PIECES_IN_GAME = 5000

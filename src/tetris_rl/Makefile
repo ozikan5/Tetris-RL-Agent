@@ -2,10 +2,12 @@
 CC = c++
 
 # Define the compiler flags (-O3 for max speed, -shared/-fPIC for Python module)
-CCFLAGS = -O3 -Wall -shared -std=c++14 -fPIC -undefined dynamic_lookup
+CCFLAGS = -O3 -Wall -shared -std=c++14 -fPIC -undefined dynamic_lookup -Xpreprocessor -fopenmp
 
 # Automatically grab the Pybind11 include paths from your Python environment
-INCLUDES = $(shell python3 -m pybind11 --includes)
+INCLUDES = $(shell python3 -m pybind11 --includes) -I/opt/homebrew/opt/libomp/include
+
+LDFLAGS = -L/opt/homebrew/opt/libomp/lib -lomp
 
 # Automatically grab the correct file extension for your OS (.so, .pyd, etc.)
 SUFFIX = $(shell python3-config --extension-suffix)
@@ -19,7 +21,7 @@ all: $(TARGET)
 
 # The compilation rule
 $(TARGET): $(SRC)
-	$(CC) $(CCFLAGS) $(INCLUDES) $(SRC) -o $(TARGET)
+	$(CC) $(CCFLAGS) $(INCLUDES) $(SRC) -o $(TARGET) $(LDFLAGS)
 
 # Rule to clean up the compiled files
 clean:
