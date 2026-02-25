@@ -12,5 +12,6 @@ setup(
     install_requires=[
         "numpy>=1.21.0",
         "torch>=1.9.0",
+        "pybind11>=2.10.0",
     ],
 )
