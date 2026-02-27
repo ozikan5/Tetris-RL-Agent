@@ -49,6 +49,13 @@ class DQNAgent:
 
         self.buffer = ReplayBuffer(queue_len)
         self.model = DQNModel(hidden_layer_size)
+
+        # target network: frozen copy of model, synced every target_update_freq learn() calls
+        self.target_model = DQNModel(hidden_layer_size)
+        self.target_model.load_state_dict(self.model.state_dict())
+        self.target_update_freq = 500
+        self.learn_steps = 0
+
         self.loss_fun = nn.MSELoss()
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
 
@@ -103,15 +110,12 @@ class DQNAgent:
         # get the tensors
         states, rewards, next_states, game_overs = self.buffer.recall(self.batch_size)
 
-        # we calculate the targets, that is the value of the current state from reward and value of next_state
+        # use target network for stable TD targets (no gradient needed)
         with torch.no_grad():
-            # get our evaluation
-            next_preds = self.model(next_states)
-
-            # only reward remaining for finished games
+            next_preds = self.target_model(next_states)
             targets = rewards + (self.gamma * next_preds * (1.0 - game_overs))
 
-        # now we have to get our predicions
+        # predictions from the main model (gradients flow here)
         preds = self.model(states)
 
         # calculate our loss
@@ -125,6 +129,11 @@ class DQNAgent:
 
         # update weights of the model based on the loss
         self.optimizer.step()
+
+        # periodically sync target network with main model
+        self.learn_steps += 1
+        if self.learn_steps % self.target_update_freq == 0:
+            self.target_model.load_state_dict(self.model.state_dict())
 
     # function for decaying epsilon over time
     def update_epsilon(self):
