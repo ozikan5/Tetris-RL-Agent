@@ -1,0 +1,24 @@
+Starting to train the DQN agent...
+10000 episodes.
+Episode: 100 | Score: 87 | Avg100: 19.3 | Epsilon: 0.303 | Buffer: 2942
+Episode: 200 | Score: 322 | Avg100: 105.6 | Epsilon: 0.183 | Buffer: 7856
+Episode: 300 | Score: 588 | Avg100: 263.6 | Epsilon: 0.111 | Buffer: 15001
+Episode: 400 | Score: 182 | Avg100: 538.9 | Epsilon: 0.067 | Buffer: 25321
+Episode: 500 | Score: 478 | Avg100: 941.6 | Epsilon: 0.041 | Buffer: 39625
+Episode: 600 | Score: 1991 | Avg100: 1643.8 | Epsilon: 0.025 | Buffer: 61402
+Episode: 700 | Score: 1667 | Avg100: 2496.7 | Epsilon: 0.015 | Buffer: 91310
+Episode: 800 | Score: 11852 | Avg100: 4310.3 | Epsilon: 0.010 | Buffer: 100000
+Episode: 900 | Score: 972 | Avg100: 4390.5 | Epsilon: 0.010 | Buffer: 100000
+Episode: 1000 | Score: 1640 | Avg100: 4648.5 | Epsilon: 0.010 | Buffer: 100000
+Episode: 1100 | Score: 1132 | Avg100: 4212.2 | Epsilon: 0.010 | Buffer: 100000
+Episode: 1200 | Score: 3607 | Avg100: 4976.9 | Epsilon: 0.010 | Buffer: 100000
+Episode: 1300 | Score: 3329 | Avg100: 5305.2 | Epsilon: 0.010 | Buffer: 100000
+Episode: 1400 | Score: 4572 | Avg100: 4902.8 | Epsilon: 0.010 | Buffer: 100000
+Episode: 1500 | Score: 280 | Avg100: 4831.7 | Epsilon: 0.010 | Buffer: 100000
+Episode: 1600 | Score: 1011 | Avg100: 4473.5 | Epsilon: 0.010 | Buffer: 100000
+Episode: 1700 | Score: 9514 | Avg100: 5336.3 | Epsilon: 0.010 | Buffer: 100000
+Episode: 1800 | Score: 4241 | Avg100: 5137.6 | Epsilon: 0.010 | Buffer: 100000
+Episode: 1900 | Score: 455 | Avg100: 4955.7 | Epsilon: 0.010 | Buffer: 100000
+Episode: 2000 | Score: 894 | Avg100: 4636.4 | Epsilon: 0.010 | Buffer: 100000
+
+Duration: 37 minutes

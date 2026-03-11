@@ -117,6 +117,22 @@ cpp_moves = env.get_next_states()  # list of NextState objects
 - −25 on game over (piece overlaps top row)
 - −10 and game over on illegal move
 
+## Results
+
+Training runs (10,000 episodes each, unless noted) on the same reward scheme:
+
+| Agent | Final Avg100 | Peak Score | Training Time | Notes |
+|-------|--------------|------------|---------------|-------|
+| **Tabular (TD(0))** | ~163 | 408 | ~10 min | 507 unique states; slower learning due to coarse discretization |
+| **DQN (Python env)** | ~2,900 | 11,489 | ~1 hr | Target network, replay buffer 100k |
+| **DQN (C++ env)** | ~4,600 | 11,852 | ~37 min | Same agent, faster environment (OpenMP); ~37% shorter runtime |
+
+- **Tabular** learns basic survival but plateaus quickly; the 4-feature discretization limits expressiveness.
+- **DQN** learns much stronger policies; the neural network generalizes across continuous states.
+- **C++ environment** yields similar or better scores with shorter training time thanks to parallel `get_next_states()`.
+
+Sample outputs: `tabular_output.txt`, `dqn_python_output.txt`, `dqn_cpp_output.txt`.
+
 ## License
 
 Use as you like; no license file included.
