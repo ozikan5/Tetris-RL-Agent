@@ -7820,7 +7820,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Setup: add project src to path; import only env and features (models/agents defined below)</span>
@@ -7837,8 +7837,8 @@ a.anchor-link {
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">optim</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">tetris_rl.environment</span><span class="w"> </span><span class="kn">import</span> <span class="n">TetrisEngine</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">tetris_rl.features</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_features</span>
+<span class="c1"># TetrisEngine defined in notebook below (Section 1)</span>
 </pre></div>
 </div>
 </div>
@@ -7859,6 +7859,98 @@ a.anchor-link {
 <li>+10 * (lines_cleared)^2 for line clears (incentivizes combos)</li>
 <li>-25 on game over (moderate penalty so one loss does not dominate learning; -100 was too harsh in early experiments)</li>
 </ul>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># TetrisEngine (from tetris_rl.environment)</span>
+<span class="n">BOARD_HEIGHT</span><span class="p">,</span> <span class="n">BOARD_WIDTH</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">10</span>
+<span class="n">TETROMINOS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'I'</span><span class="p">:</span> <span class="p">[[(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)],</span> <span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)]],</span>
+    <span class="s1">'O'</span><span class="p">:</span> <span class="p">[[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)]],</span>
+    <span class="s1">'T'</span><span class="p">:</span> <span class="p">[[(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)],</span> <span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)],</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)],</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)]],</span>
+    <span class="s1">'S'</span><span class="p">:</span> <span class="p">[[(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)],</span> <span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)]],</span>
+    <span class="s1">'Z'</span><span class="p">:</span> <span class="p">[[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)],</span> <span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)]],</span>
+    <span class="s1">'J'</span><span class="p">:</span> <span class="p">[[(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)],</span> <span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)],</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)],</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)]],</span>
+    <span class="s1">'L'</span><span class="p">:</span> <span class="p">[[(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)],</span> <span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)],</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)],</span> <span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)]]</span>
+<span class="p">}</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TetrisEngine</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">BOARD_HEIGHT</span><span class="p">,</span> <span class="n">BOARD_WIDTH</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_over</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_piece</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_new_piece</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_new_piece</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">TETROMINOS</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">'name'</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">'rotations'</span><span class="p">:</span> <span class="n">TETROMINOS</span><span class="p">[</span><span class="n">name</span><span class="p">]}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_valid_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board</span><span class="p">,</span> <span class="n">piece_coords</span><span class="p">,</span> <span class="n">offset_y</span><span class="p">,</span> <span class="n">offset_x</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="ow">in</span> <span class="n">piece_coords</span><span class="p">:</span>
+            <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">offset_y</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="n">offset_x</span> <span class="o">+</span> <span class="n">x</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">c</span> <span class="o">&gt;=</span> <span class="n">BOARD_WIDTH</span> <span class="ow">or</span> <span class="n">r</span> <span class="o">&gt;=</span> <span class="n">BOARD_HEIGHT</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">board</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_next_states</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">states</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">rot_idx</span><span class="p">,</span> <span class="n">shape_coords</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_piece</span><span class="p">[</span><span class="s1">'rotations'</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">BOARD_WIDTH</span> <span class="o">+</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid_position</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="p">,</span> <span class="n">shape_coords</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid_position</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="p">,</span> <span class="n">shape_coords</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+                    <span class="n">y</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">next_board</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">py</span><span class="p">,</span> <span class="n">px</span><span class="p">)</span> <span class="ow">in</span> <span class="n">shape_coords</span><span class="p">:</span>
+                    <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">y</span> <span class="o">+</span> <span class="n">py</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">px</span>
+                    <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="n">BOARD_HEIGHT</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">c</span> <span class="o">&lt;</span> <span class="n">BOARD_WIDTH</span><span class="p">:</span>
+                        <span class="n">next_board</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">cleared_board</span><span class="p">,</span> <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clear_lines</span><span class="p">(</span><span class="n">next_board</span><span class="p">)</span>
+                <span class="n">reward</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="p">(</span><span class="n">lines</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span>
+                <span class="n">is_game_over</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">cleared_board</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">is_game_over</span><span class="p">:</span>
+                    <span class="n">reward</span> <span class="o">-=</span> <span class="mi">25</span>
+                <span class="n">states</span><span class="p">[(</span><span class="n">rot_idx</span><span class="p">,</span> <span class="n">x</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">cleared_board</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">is_game_over</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">states</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+        <span class="n">rot_idx</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">action</span>
+        <span class="n">possible_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_next_states</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">rot_idx</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="ow">in</span> <span class="n">possible_states</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_over</span> <span class="o">=</span> <span class="n">possible_states</span><span class="p">[(</span><span class="n">rot_idx</span><span class="p">,</span> <span class="n">x</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">score</span> <span class="o">+=</span> <span class="n">reward</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_piece</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_new_piece</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">reward</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_over</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board</span><span class="p">):</span>
+        <span class="n">full_rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">board</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">num_cleared</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">full_rows</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">num_cleared</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">board</span> <span class="o">=</span> <span class="n">board</span><span class="p">[</span><span class="o">~</span><span class="n">full_rows</span><span class="p">]</span>
+            <span class="n">board</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_cleared</span><span class="p">,</span> <span class="n">BOARD_WIDTH</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span> <span class="n">board</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">board</span><span class="p">,</span> <span class="n">num_cleared</span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>
@@ -7907,7 +7999,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Feature extraction (from tetris_rl.features - shown for completeness)</span>
@@ -7975,7 +8067,7 @@ This bootstraps from V(s') instead of waiting for the full return. Hyperparamete
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># TabularAgent: discretize features, epsilon-greedy, TD(0) update</span>
@@ -8037,7 +8129,7 @@ This bootstraps from V(s') instead of waiting for the full return. Hyperparamete
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># DQNModel: 4 -&gt; 64 -&gt; 64 -&gt; 64 -&gt; 1, ReLU, orthogonal init</span>
@@ -8073,7 +8165,7 @@ This bootstraps from V(s') instead of waiting for the full return. Hyperparamete
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># ReplayBuffer + DQNAgent</span>
